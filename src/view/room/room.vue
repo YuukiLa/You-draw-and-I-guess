@@ -25,6 +25,7 @@
 
 <script>
   import MyAvatar from '@/components/my-avatar/my-avatar'
+
   export default {
     name: "room",
     components: {
@@ -33,45 +34,43 @@
     data() {
       return {
         room: {
-          roomId: '123445',
-          roomUsers: [
-            {
-              username: '1',
-              avatar: '1.webp'
-            },
-            {
-              username: '2',
-              avatar: '1.webp'
-            },
-            {
-              username: '3',
-              avatar: '1.webp'
-            },
-            {
-              username: '4',
-              avatar: '1.webp'
-            },
-            {
-              username: '5',
-              avatar: '1.webp'
-            },
-            {
-              username: '6',
-              avatar: '1.webp'
-            },
-          ]
+          roomId: '',
+          roomUsers: []
         }
       }
+    },
+    computed: {
+      onEnterRoomEvent() {
+        return this.$store.getters.onEvent("10001")
+      }
+    },
+    watch: {
+      onEnterRoomEvent: function (o, n) {
+        console.log(o)
+        if (o !== n && o) {
+          this.room.roomUsers = o.data
+        }
+      }
+    },
+    methods: {
+      handleEnterRoom(users) {
+
+      }
+    },
+    mounted() {
+      this.room.roomId = this.$route.params.id
+      this.$store.dispatch("initWs", {cmd: "10001", data: {roomId: this.room.roomId}})
     }
   }
 </script>
 
 <style scoped>
-.avatar {
-  width: 85px;
-  height: 85px;
-}
-  .item{
+  .avatar {
+    width: 85px;
+    height: 85px;
+  }
+
+  .item {
     text-align: center;
   }
 </style>

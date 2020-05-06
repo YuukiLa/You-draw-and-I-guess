@@ -8,16 +8,43 @@ export default new Vuex.Store({
   state: {
     user: {},
     hasInfo: false,
+    ws:null,
+    eventList:[]
   },
   mutations: {
     set_user: (state, data) => {
       state.user = data
       state.hasInfo=true
+    },
+    init_ws: (state,data) => {
+      let url = `${process.env["VUE_APP_BASE_WS"]}/ws?token=${localStorage.getItem("token")}`
+
+      state.ws = new WebSocket(url)
+      state.ws.onopen = function () {
+        console.log("连接成功！")
+        state.ws.send(JSON.stringify(data))
+      }
+      state.ws.onmessage=function (data) {
+        console.log("ws接收！")
+        console.log(data)
+        state.eventList.push(JSON.parse(data.data))
+      }
+      state.ws.οnerrοr=function(e) { //错误
+        console.log("ws错误!");
+        console.log(e);
+      }
+      state.ws.onclose=function(e) { //关闭
+        console.log("ws关闭！");
+        console.log(e);
+      }
+    },
+    send_ws: (state,data) => {
+      state.ws.send(data)
     }
   },
   actions: {
     async getUserInfo(context, data) {
-      request.get("/api/user/info").then(res=> {
+      await request.get("/api/user/info").then(res=> {
         if(res.code===200) {
           context.commit("set_user",res.data)
         }else if(res.code==401) {
@@ -25,7 +52,28 @@ export default new Vuex.Store({
           window.location.href="/login"
         }
       })
+    },
+    initWs(context,data) {
+      context.commit("init_ws",data)
+    },
+    sendWs(context,data) {
+      context.commit("send_ws")
     }
   },
-  getters: {}
-});
+  getters: {
+    onEvent(state) {
+      return function (method) {
+        let index = state.eventList.map((eb) => {
+          return eb.cmd
+        }).indexOf(method);
+        if (state.eventList.length > 0 && index >= 0) {
+          let result = Object.assign({}, state.eventList[index]);
+          state.eventList.splice(index, 1);
+          return result;
+        }
+
+        return null;
+      }
+    }
+  }
+})

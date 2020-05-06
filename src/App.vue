@@ -9,6 +9,17 @@
 export default {
   name: 'App',
   components: {
+  },
+  methods: {
+    beforeunloadFn(e) {
+      console.log('刷新或关闭')
+      if(this.$store.state.ws) {
+        this.$store.state.ws.close()
+      }
+    }
+  },
+  created() {
+    window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
   }
 }
 </script>

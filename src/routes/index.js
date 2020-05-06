@@ -15,7 +15,7 @@ const routes = [
 		name: 'login',
 		component: () => import('@/view/login/login')
 	},{
-		path: '/room',
+		path: '/room/:id',
 		name: 'room',
 		component: () => import('@/view/room/room')
 	},{

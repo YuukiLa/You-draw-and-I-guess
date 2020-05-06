@@ -1,6 +1,7 @@
 
 
 import axios from 'axios';
+import IView from 'iview'
 import qs from 'qs';
 
 
@@ -30,23 +31,25 @@ service.interceptors.request.use(
 service.interceptors.response.use((config) => {
   return config.data
 }, (error) => {
-  log(error)
+  console.log(error)
   if (error.response) {
     // const errorMessage = error.response.data === null ? '系统内部异常，请联系网站管理员' : error.response.data.msg
     const {status, data} = error.response
     if (status == 400) {
       // window.top.location = '/login';
-      HeyUI.$Message.error(data.msg || '参数错误')
+      IView.Message.error(data || '参数错误')
     }
     if (status == 401 || status == 403) {
       // window.top.location = '/login';
-      HeyUI.$Message.error(data.msg || '暂无权限')
+      IView.Message.error(data || '暂无权限')
+      localStorage.removeItem("token")
+      window.location.reload()
     }
     if (status == 404) {
-      HeyUI.$Message.error(data.msg || '访问地址不存在')
+      IView.Message.error(data|| '访问地址不存在')
     }
     if (status == 500) {
-      HeyUI.$Message.error(data.msg || '后台异常')
+      IView.Message.error(data || '后台异常')
     }
   }
   return Promise.reject(error)
@@ -69,6 +72,15 @@ let ajax = {
   postJson: function (url, paramJson) {
     return service.post(
         url, paramJson
+    )
+  },
+  put: function (url, data) {
+    return service.put(
+        url, data, {
+          transformRequest: [(data) => {
+            return qs.stringify(data)
+          }]
+        }
     )
   },
   putJson: function (url, paramJson) {
