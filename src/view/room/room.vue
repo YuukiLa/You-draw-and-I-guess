@@ -16,7 +16,7 @@
           </Col>
         </Row>
         <Row type="flex" justify="space-around" style="margin-top: 100px">
-          <Button>开始游戏</Button>
+          <Button v-if="showStartGameBtn" @click="startGame">开始游戏</Button>
         </Row>
       </div>
     </Card>
@@ -36,30 +36,52 @@
         room: {
           roomId: '',
           roomUsers: []
-        }
+        },
+        showStartGameBtn: false
       }
     },
     computed: {
       onEnterRoomEvent() {
         return this.$store.getters.onEvent("10001")
-      }
+      },
+      onMasterEvent() {
+        return this.$store.getters.onEvent("10002")
+      },
+      onStartGameEvent() {
+        return this.$store.getters.onEvent("10010")
+      },
     },
     watch: {
       onEnterRoomEvent: function (o, n) {
-        console.log(o)
         if (o !== n && o) {
           this.room.roomUsers = o.data
+        }
+      },
+      onMasterEvent: function (o, n) {
+        if (o !== n && o) {
+          this.showStartGameBtn = true
+        }
+      },
+      onStartGameEvent: function (o, n) {
+        if (o !== n && o) {
+          this.$router.push({name:"game",params:{id:this.room.roomId}})
         }
       }
     },
     methods: {
-      handleEnterRoom(users) {
-
+      startGame() {
+        let data = {
+          cmd: "10010",
+          data: {},
+          msg: ""
+        }
+        this.$store.dispatch("sendWs",JSON.stringify(data))
       }
     },
     mounted() {
       this.room.roomId = this.$route.params.id
-      this.$store.dispatch("initWs", {cmd: "10001", data: {roomId: this.room.roomId}})
+      if(!this.$store.state.ws)
+        this.$store.dispatch("initWs", {cmd: "10001", data: {roomId: this.room.roomId}})
     }
   }
 </script>

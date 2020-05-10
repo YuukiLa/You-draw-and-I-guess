@@ -27,8 +27,10 @@
 </template>
 
 <script>
+  import mixinWs from './game-mixin-ws'
   export default {
     name: "game",
+    mixins: [mixinWs],
     data() {
       return {
         answer: '',
@@ -51,12 +53,22 @@
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
       },
       sendDanmu() {
+        this.createDanmu(this.answer)
+        let wsData = {
+          cmd:"10013",
+          data: {
+            danmu: this.answer
+          }
+        }
+        this.wsSend(wsData)
+        this.answer = '';
+      },
+      createDanmu(danmu) {
         let oDiv = document.createElement('span');
-        oDiv.innerHTML = this.answer;
+        oDiv.innerHTML = danmu;
         oDiv.className = 'magictime twisterInUp';
         this.$refs.content.appendChild(oDiv);
         this.init(oDiv);
-        this.answer = '';
       },
       show(){
         this.canvas = this.$refs.canvas;//指定canvas
@@ -67,11 +79,21 @@
         this.ctx.strokeStyle = this.pencilColor
       },
       canvasDown(e) {
+        if (!this.isYou) return
         this.canvasMoveUse = true;
         const canvasX = e.clientX - e.target.offsetLeft;
         const canvasY = e.clientY - e.target.offsetTop + document.documentElement.scrollTop;
         this.ctx.beginPath() // 移动的起点
         this.ctx.moveTo(canvasX, canvasY);
+        let wsData = {
+          cmd:"10012",
+          data: {
+            type: 1,
+            x: canvasX,
+            y: canvasY
+          }
+        }
+        this.wsSend(wsData)
 
       },
       canvasMove(e) {
@@ -83,7 +105,16 @@
           canvasX = e.clientX - t.offsetLeft;
           canvasY = e.clientY - t.offsetTop + document.documentElement.scrollTop;
           this.ctx.lineTo(canvasX, canvasY);
-          this.ctx.stroke();
+          this.ctx.stroke()
+          let wsData = {
+            cmd:"10012",
+            data: {
+              type: 2,
+              x: canvasX,
+              y: canvasY
+            }
+          }
+          this.wsSend(wsData)
         }
       },
       canvasUp(e) {
@@ -130,6 +161,7 @@
     mounted() {
       this.show()
       window.onresize = this.resize
+      this.getFirstGameParam()
     }
   }
 </script>

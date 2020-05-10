@@ -17,7 +17,7 @@ export default new Vuex.Store({
       state.hasInfo=true
     },
     init_ws: (state,data) => {
-      let url = `${process.env["VUE_APP_BASE_WS"]}/ws?token=${localStorage.getItem("token")}`
+      let url = `${process.env["VUE_APP_BASE_WS"]}/ws?token=${encodeURIComponent(localStorage.getItem("token"))}`
 
       state.ws = new WebSocket(url)
       state.ws.onopen = function () {
@@ -27,7 +27,12 @@ export default new Vuex.Store({
       state.ws.onmessage=function (data) {
         console.log("ws接收！")
         console.log(data)
-        state.eventList.push(JSON.parse(data.data))
+        if(data.data) {
+          state.eventList.push(JSON.parse(data.data))
+        }else {
+          state.eventList.push({})
+        }
+
       }
       state.ws.οnerrοr=function(e) { //错误
         console.log("ws错误!");
@@ -57,7 +62,7 @@ export default new Vuex.Store({
       context.commit("init_ws",data)
     },
     sendWs(context,data) {
-      context.commit("send_ws")
+      context.commit("send_ws",data)
     }
   },
   getters: {
