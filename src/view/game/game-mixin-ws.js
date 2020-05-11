@@ -21,19 +21,20 @@ const wsMixin = {
   watch: {
     onGameParamEvent: function (o, n) {
       if (o !== n && o) {
-
+        let username=this.$store.getters.currUserName(o.data.currUser)
+        let round = o.data.round
+        this.$Notice.info({title:`第${round}轮，${username}开始作画`})
       }
     },
     onIsYouEvent: function (o, n) {
       if (o !== n && o) {
         this.isYou = true
+        this.$Notice.success({title:`轮到你了，题目是${o.data.currWord}`,duration:0})
       }
     },
     onDanmuEvent: function (o, n) {
       if (o !== n && o) {
-
-        let {danmu} = o.data
-        this.createDanmu(danmu)
+        this.createDanmu(o.data)
       }
     },
     onDrawEvent: function (o, n) {

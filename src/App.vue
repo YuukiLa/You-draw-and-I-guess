@@ -40,10 +40,23 @@ export default {
     top: 50%;
     transform: translateY(-50%);
   }
-  .s_show span{
+  .s_show div {
     position: fixed;
+    height: 18px;
+    z-index: 9999;
+  }
+  .s_show span {
+    line-height: 18px;
     font-size: 18px;
     font-weight: bold;
-    z-index: 9999;
+  }
+
+  .s_show div img {
+    width: 25px;
+    height: 25px;
+    vertical-align:middle;
+    border-radius:50%;
+    -webkit-border-radius:50%;
+    -moz-border-radius:50%;
   }
 </style>

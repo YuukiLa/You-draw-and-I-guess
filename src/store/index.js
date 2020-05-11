@@ -8,6 +8,7 @@ export default new Vuex.Store({
   state: {
     user: {},
     hasInfo: false,
+    gamer: [],
     ws:null,
     eventList:[]
   },
@@ -15,6 +16,9 @@ export default new Vuex.Store({
     set_user: (state, data) => {
       state.user = data
       state.hasInfo=true
+    },
+    set_gamer: (state,data) => {
+      state.gamer = data
     },
     init_ws: (state,data) => {
       let url = `${process.env["VUE_APP_BASE_WS"]}/ws?token=${encodeURIComponent(localStorage.getItem("token"))}`
@@ -79,6 +83,9 @@ export default new Vuex.Store({
 
         return null;
       }
+    },
+    currUserName: (state) => (id) => {
+      return state.gamer.find(item=> item.account===id).username
     }
   }
 })

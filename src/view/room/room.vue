@@ -55,6 +55,7 @@
       onEnterRoomEvent: function (o, n) {
         if (o !== n && o) {
           this.room.roomUsers = o.data
+          this.$store.commit("set_gamer",o.data)
         }
       },
       onMasterEvent: function (o, n) {

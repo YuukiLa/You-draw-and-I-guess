@@ -38,7 +38,8 @@
         pencilSize: 0,
         canvasMoveUse: false,
         canvas: null,
-        ctx: null
+        ctx: null,
+        userInfo: this.$store.state.user
       }
     },
     methods: {
@@ -53,22 +54,36 @@
         this.ctx.clearRect(0,0,this.canvas.width,this.canvas.height)
       },
       sendDanmu() {
-        this.createDanmu(this.answer)
+        let danmu = {
+          danmu: this.answer,
+          user: this.userInfo.username,
+          avatar:this.userInfo.avatar
+        }
+        // this.createDanmu(danmu)
         let wsData = {
           cmd:"10013",
-          data: {
-            danmu: this.answer
-          }
+          data: danmu
         }
         this.wsSend(wsData)
         this.answer = '';
       },
       createDanmu(danmu) {
+        if(danmu.isAnswer) {
+          this.$Notice.success({title:`${danmu.user}猜对了答案！15s后进入下一轮~`})
+        }
+        let div =document.createElement('div')
         let oDiv = document.createElement('span');
-        oDiv.innerHTML = danmu;
-        oDiv.className = 'magictime twisterInUp';
-        this.$refs.content.appendChild(oDiv);
-        this.init(oDiv);
+        let userDiv = document.createElement('span');
+        let avatarDiv = document.createElement('img');
+        oDiv.innerHTML = danmu.danmu
+        div.className = 'magictime twisterInUp';
+        userDiv.innerHTML = danmu.user+": "
+        avatarDiv.src = require(`@/assets/avatar/${danmu.avatar}`)
+        div.appendChild(avatarDiv)
+        div.appendChild(userDiv)
+        div.appendChild(oDiv)
+        this.$refs.content.appendChild(div)
+        this.init(div);
       },
       show(){
         this.canvas = this.$refs.canvas;//指定canvas
