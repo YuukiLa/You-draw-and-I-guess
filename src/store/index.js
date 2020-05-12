@@ -47,6 +47,10 @@ export default new Vuex.Store({
         console.log(e);
       }
     },
+    close_ws: (state,data) => {
+      state.ws.close()
+      state.ws = null
+    },
     send_ws: (state,data) => {
       state.ws.send(data)
     }
@@ -64,6 +68,9 @@ export default new Vuex.Store({
     },
     initWs(context,data) {
       context.commit("init_ws",data)
+    },
+    closeWs(context,data) {
+      context.commit("close_ws",data)
     },
     sendWs(context,data) {
       context.commit("send_ws",data)

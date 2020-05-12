@@ -5,8 +5,8 @@
         <Icon type="ios-home-outline"></Icon>
         {{room.roomId}}
       </p>
-      <a slot="extra">
-        退出房间
+      <a slot="extra" @click="exitRoom">
+        {{showStartGameBtn?'解散房间':'退出房间'}}
       </a>
       <div>
         <Row type="flex" justify="space-around">
@@ -50,6 +50,9 @@
       onStartGameEvent() {
         return this.$store.getters.onEvent("10010")
       },
+      onDissolveRoomEvent() {
+        return this.$store.getters.onEvent("10008")
+      }
     },
     watch: {
       onEnterRoomEvent: function (o, n) {
@@ -67,7 +70,14 @@
         if (o !== n && o) {
           this.$router.push({name:"game",params:{id:this.room.roomId}})
         }
-      }
+      },
+      onDissolveRoomEvent:function (o, n) {
+        if (o !== n && o) {
+          this.$Message.warning("房间已被房主解散!即将返回首页...")
+          this.$store.dispatch("closeWs")
+          setTimeout(()=>this.$router.replace("/"),3000)
+        }
+      },
     },
     methods: {
       startGame() {
@@ -77,6 +87,16 @@
           msg: ""
         }
         this.$store.dispatch("sendWs",JSON.stringify(data))
+      },
+      exitRoom() {
+        let data = {
+          cmd: "10008",
+          data: {},
+          msg: ""
+        }
+        this.$store.dispatch("sendWs",JSON.stringify(data))
+        this.$store.dispatch("closeWs")
+        this.$router.back()
       }
     },
     mounted() {

@@ -1,7 +1,8 @@
 const wsMixin = {
   data() {
     return {
-      isYou: false
+      isYou: false,
+      gameOver: false
     }
   },
   computed: {
@@ -16,6 +17,9 @@ const wsMixin = {
     },
     onDanmuEvent() {
       return this.$store.getters.onEvent("10013")
+    },
+    onGameOverEvent() {
+      return this.$store.getters.onEvent("13000")
     }
   },
   watch: {
@@ -23,6 +27,7 @@ const wsMixin = {
       if (o !== n && o) {
         let username=this.$store.getters.currUserName(o.data.currUser)
         let round = o.data.round
+        this.isYou = false
         this.$Notice.info({title:`第${round}轮，${username}开始作画`})
       }
     },
@@ -47,6 +52,13 @@ const wsMixin = {
           this.ctx.lineTo(x, y)
           this.ctx.stroke()
         }
+      }
+    },
+    onGameOverEvent: function (o, n) {
+      if (o !== n && o) {
+        this.$Message.success("游戏结束啦~稍候会返回到首页，请重新创建房间哦~")
+        this.$store.dispatch("closeWs")
+        this.$router.replace("/")
       }
     },
   },

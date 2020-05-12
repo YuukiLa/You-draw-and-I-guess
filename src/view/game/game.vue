@@ -69,7 +69,8 @@
       },
       createDanmu(danmu) {
         if(danmu.isAnswer) {
-          this.$Notice.success({title:`${danmu.user}猜对了答案！15s后进入下一轮~`})
+          this.$Notice.success({title:`${danmu.user}猜对了答案！进入下一轮~`})
+          this.clearCanvas()
         }
         let div =document.createElement('div')
         let oDiv = document.createElement('span');
@@ -160,7 +161,8 @@
             that.move(k,obj,maxLeft);
           });
         }else{
-          this.$refs.content.removeChild(obj)
+          if (this.$refs.content)
+            this.$refs.content.removeChild(obj)
         }
       },
       randomColor() {
